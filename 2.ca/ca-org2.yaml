@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ca-buyer
+spec:
+  selector:
+    matchLabels:
+      app: ca-buyer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ca-buyer
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: agmpvc
+      containers:
+        - name: ca-buyer
+          image: hyperledger/fabric-ca:1.4.9
+          imagePullPolicy: 'Always'
+          command:
+            [
+              'fabric-ca-server',
+              'start',
+              '-b',
+              'admin:adminpw',
+              '--port',
+              '8054',
+              '-d',
+            ]
+          resources:
+            requests:
+              memory: '300Mi'
+              cpu: '150m'
+            limits:
+              memory: '400Mi'
+              cpu: '250m'
+          env:
+            - name: FABRIC_CA_SERVER_CA_NAME
+              value: ca-buyer
+            - name: FABRIC_CA_SERVER_TLS_ENABLED
+              value: 'true'
+            - name: FABRIC_CA_SERVER_CSR_CN
+              value: 'ca-buyer'
+            - name: FABRIC_CA_SERVER_CSR_HOSTS
+              value: 'ca-buyer'
+          volumeMounts:
+            - name: data
+              mountPath: /etc/hyperledger/fabric-ca-server
+              subPath: organizations/fabric-ca/buyer

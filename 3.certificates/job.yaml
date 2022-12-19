@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-certs
+spec:
+  parallelism: 1
+  completions: 1
+  template:
+    metadata:
+      name: create-certs
+    spec:
+      volumes:
+        - name: fabricfiles
+          persistentVolumeClaim:
+            claimName: agmpvc
+      containers:
+        - name: create-certs
+          image: hyperledger/fabric-ca-tools:latest
+          resources:
+            requests:
+              memory: '100Mi'
+              cpu: '100m'
+            limits:
+              memory: '200Mi'
+              cpu: '150m'
+          volumeMounts:
+            - mountPath: /organizations
+              name: fabricfiles
+              subPath: organizations
+            - mountPath: /scripts
+              name: fabricfiles
+              subPath: scripts
+          command:
+            - /bin/sh
+            - -c
+            - |
+              ./scripts/orderer-certs.sh &&
+              ./scripts/seller-certs.sh &&
+              ./scripts/buyer-certs.sh
+      restartPolicy: Never

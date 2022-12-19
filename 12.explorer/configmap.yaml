@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: explorer-config
+data:
+  network.json: |-
+    {
+    "name": "first-network",
+    "version": "1.0.0",
+    "client": {
+      "tlsEnable": true,
+      "adminCredential": {
+        "id": "exploreradmin",
+        "password": "exploreradminpw"
+      },
+      "enableAuthentication": false,
+      "organization": "SellerMSP",
+      "connection": {
+        "timeout": {
+          "peer": {
+            "endorser": "300"
+          },
+          "orderer": "300"
+        }
+      }
+    },
+    "channels": {
+      "agmchannel": {
+        "peers": {
+          "peer0-seller": {}
+        },
+        "connection": {
+          "timeout": {
+            "peer": {
+              "endorser": "6000",
+              "eventHub": "6000",
+              "eventReg": "6000"
+            }
+          }
+        }
+      }
+    },
+    "organizations": {
+      "SellerMSP": {
+        "mspid": "SellerMSP",
+        "adminPrivateKey": {
+          "path": "/organizations/peerOrganizations/seller.agm.com/users/Admin@seller.agm.com/msp/keystore/priv_sk"
+        },
+        "peers": [
+          "peer0-seller"
+        ],
+        "signedCert": {
+          "path": "/organizations/peerOrganizations/seller.agm.com/users/Admin@seller.agm.com/msp/signcerts/cert.pem"
+        }
+      }
+    },
+    "peers": {
+      "peer0-seller": {
+        "tlsCACerts": {
+          "path": "/organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt"
+        },
+        "url": "grpcs://peer0-seller:7051"
+      }
+    }
+    }
+
+  config.json: |-
+    {
+    "network-configs": {
+      "first-network": {
+        "name": "first-network",
+        "profile": "./first-network.json"
+      }
+    },
+    "license": "Apache-2.0"
+    }
