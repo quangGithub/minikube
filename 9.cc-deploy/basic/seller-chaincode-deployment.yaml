@@ -18,12 +18,12 @@ spec:
         app: chaincode-basic-seller
     spec:
       containers:
-        - image: leminhy89/basic-chaincode-hlf:1.0
+        - image: quanglathe/basic-chaincode-hlf:1.0
           imagePullPolicy: Always
           name: chaincode-basic-seller
           env:
             - name: CHAINCODE_ID
-              value: 'basic:1ebc1bed8e89639b9f85e1866cb87ea38e5e123a74d92d73918649bb87c7348e'
+              value: 'basic:7deac559c62e3eb24806df28510ca3af3fe534471455e4f519055729770a6257'
             - name: CHAINCODE_SERVER_ADDRESS
               value: '0.0.0.0:7052'
           ports:

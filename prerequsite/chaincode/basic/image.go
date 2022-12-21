@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"time"
 
@@ -12,6 +13,10 @@ import (
 	"github.com/hyperledger/fabric/common/flogging"
 )
 
+type serverConfig struct {
+	CCID    string
+	Address string
+}
 type SmartContract struct {
 	contractapi.Contract
 }
@@ -353,12 +358,25 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 	return images, nil
 }
 func main() {
+	// See chaincode.env.example
+	config := serverConfig{
+		CCID:    os.Getenv("CHAINCODE_ID"),
+		Address: os.Getenv("CHAINCODE_SERVER_ADDRESS"),
+	}
 	chaincode, err := contractapi.NewChaincode(new(SmartContract))
 	if err != nil {
 		fmt.Printf("Error create image chaincode: %s", err.Error())
 		return
 	}
-	if err := chaincode.Start(); err != nil {
+	server := &shim.ChaincodeServer{
+		CCID:    config.CCID,
+		Address: config.Address,
+		CC:      chaincode,
+		TLSProps: shim.TLSProperties{
+			Disabled: true,
+		},
+	}
+	if err := server.Start(); err != nil {
 		fmt.Printf("Error starting chaincodes: %s", err.Error())
 	}
 }
