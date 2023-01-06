@@ -1,31 +1,31 @@
 ---
-name: test-network-org${ORG}
+name: agm-network
 version: 1.0.0
 client:
-  organization: Org${ORG}
+  organization: ${ORG}
   connection:
     timeout:
       peer:
         endorser: '300'
 organizations:
-  Org${ORG}:
-    mspid: Org${ORG}MSP
+  ${ORG}:
+    mspid: ${ORG}MSP
     peers:
-    - peer0-org${ORG}
+    - peer0-${ORG}
     certificateAuthorities:
-    - ca-org${ORG}
+    - ca-${ORG}
 peers:
-  peer0-org${ORG}:
+  peer0-${ORG}:
     url: grpcs://peer0-org${ORG}:${P0PORT}
     tlsCACerts:
       pem: "${PEERPEM}"
     grpcOptions:
-      ssl-target-name-override: peer0-org${ORG}
-      hostnameOverride: peer0-org${ORG}
+      ssl-target-name-override: peer0-${ORG}
+      hostnameOverride: peer0-${ORG}
 certificateAuthorities:
-  ca-org${ORG}:
+  ca-${ORG}:
     url: https://ca-org${ORG}:${CAPORT}
-    caName: ca-org${ORG}
+    caName: ca-${ORG}
     tlsCACerts:
       pem:
       - "${CAPEM}"

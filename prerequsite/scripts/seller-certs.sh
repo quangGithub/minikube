@@ -6,7 +6,7 @@ export FABRIC_CA_CLIENT_HOME=/organizations/peerOrganizations/seller.agm.com/
 
 
 
-fabric-ca-client enroll -u https://admin:adminpw@ca-seller:7054 --caname ca-seller --tls.certfiles "/organizations/fabric-ca/seller/tls-cert.pem"
+fabric-ca-client enroll -u https://agmadmin:agmadminpw@ca-seller:7054 --caname ca-seller --tls.certfiles "/organizations/fabric-ca/seller/tls-cert.pem"
 
 
 

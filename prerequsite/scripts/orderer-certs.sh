@@ -6,7 +6,7 @@
 echo $FABRIC_CA_CLIENT_HOME
 
   set -x
-  fabric-ca-client enroll -u https://admin:adminpw@ca-orderer:10054 --caname ca-orderer --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
+  fabric-ca-client enroll -u https://agmadmin:agmadminpw@ca-orderer:10054 --caname ca-orderer --tls.certfiles /organizations/fabric-ca/ordererOrg/tls-cert.pem
   { set +x; } 2>/dev/null
 
   echo 'NodeOUs:

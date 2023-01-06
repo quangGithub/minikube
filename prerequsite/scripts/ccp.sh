@@ -26,20 +26,20 @@ function yaml_ccp {
         connection-profile/ccp-template.yaml | sed -e $'s/\\\\n/\\\n          /g'
 }
 
-ORG=1
+ORG=seller
 P0PORT=7051
 CAPORT=7054
-PEERPEM=organizations/peerOrganizations/seller.agm.com/tlsca/tlsca.seller.agm.com-cert.pem
-CAPEM=organizations/peerOrganizations/seller.agm.com/ca/ca.seller.agm.com-cert.pem
+PEERPEM=organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/tlscacerts/tls-ca-seller-7054-ca-seller.pem
+CAPEM=organizations/peerOrganizations/seller.agm.com/msp/tlscacerts/ca.crt
 
 echo "$(json_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM)" > connection-profile/connection-seller.json
 echo "$(yaml_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM)" > connection-profile/connection-seller.yaml
 
-ORG=2
+ORG=buyer
 P0PORT=9051
 CAPORT=8054
-PEERPEM=organizations/peerOrganizations/buyer.agm.com/tlsca/tlsca.buyer.agm.com-cert.pem
-CAPEM=organizations/peerOrganizations/buyer.agm.com/ca/ca.buyer.agm.com-cert.pem
+PEERPEM=organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/tlscacerts/tls-ca-buyer-8054-ca-buyer.pem
+CAPEM=organizations/peerOrganizations/buyer.agm.com/msp/tlscacerts/ca.crt
 
 echo "$(json_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM)" > connection-profile/connection-buyer.json
 echo "$(yaml_ccp $ORG $P0PORT $CAPORT $PEERPEM $CAPEM)" > connection-profile/connection-buyer.yaml

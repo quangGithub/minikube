@@ -5,7 +5,7 @@
 	minikube config set memory 8192
 	minikube config set cpus 6
 	minikube start --driver=hyperv
-	minikube ip
+	
 
 
 2/ create persistent volume and persistent volume claim
@@ -23,13 +23,15 @@
     --> access to minikube and checkubectl the data must be synced
 	
 4/ copy all folder inside prerequsite foder to /v1 folder in minikube node
-ssh docker@172.28.231.244
+	minikube ip
+	ssh docker@172.31.175.126
 	ssh docker@minikube_ip password: tcuser
 	cd /v1
 	grant permission to docker user
 	sudo chown -R docker:docker ../v1
 	exit
 
+	cd ..
 	scp -r prerequsite/* docker@minikube_ip:/v1 (password: tcuser)
 	
 	ssh docker@minikube_ip password: tcuser
@@ -72,160 +74,130 @@ ssh docker@172.28.231.244
 	kubectl apply -f buyer/
 
 10/ create channel and join peer to channel
-	
-	from lens tool, filter pods by cli
-	access shell of cli-peer0-seller (can access by manual of not setup lens tool)
-	
-	execute:
-	./scripts/createAppChannel.sh
-	ls channel-artifacts/ --> to validate new channel blockubectl has been created
-	peer channel join -b ./channel-artifacts/agmchannel.block
-	
-	access shell of cli-peer0-buyer (can access by manual of not setup lens tool)
-	peer channel join -b ./channel-artifacts/agmchannel.block
-	
-	
-	peer channel list --> to verify peer join channel or not
-	
+    from lens tool, filter pods by cli
+    access shell of cli-peer0-seller (can access by manual of not setup lens tool)
+    execute:
+    ./scripts/createAppChannel.sh
+    ls channel-artifacts/ --> to validate new channel blockubectl has been created
+    peer channel join -b ./channel-artifacts/agmchannel.block
+    access shell of cli-peer0-buyer (can access by manual of not setup lens tool)
+    peer channel join -b ./channel-artifacts/agmchannel.block
+    to verify peer join channel or not
+    peer channel list 
 11/ update anchor peer
-	from lens tool, filter pods by cli
-	access shell of cli-peer0-seller (can access by manual of not setup lens tool)
-	
-	./scripts/updateAnchorPeer.sh SellerMSP
-	
-	open shell for another buyer, 3 and run the same command as below
-	./scripts/updateAnchorPeer.sh BuyerMSP
-
-
+    from lens tool, filter pods by cli
+    access shell of cli-peer0-seller (can access by manual of not setup lens tool)
+    ./scripts/updateAnchorPeer.sh SellerMSP
+    access shell of cli-peer0-buyer (can access by manual of not setup lens tool)
+    ./scripts/updateAnchorPeer.sh BuyerMSP
 12/ packaging chaincode
-	ssh docker@minikube_ip password: tcuser
-	cd /v1/chaincode/basic/packaging
-	
-	start with seller
-	tar cfz code.tar.gz connection.json --> this command with create code.tar.gz file from connection.json file
-	tar cfz basic-seller.tgz code.tar.gz metadata.json --> this command with create basic-seller.tgz file from these 2 files
-	
-	rm -rf code.tar.gz
-	
-	start with buyer
-	sudo vi connection.json
-	type I -> start to edit
-	change basic-seller:7052 --> basic-buyer:7052
-	esc -> :wq -> to save
-	do the same command from line 106
-	do the same with org3
-	
+    ssh docker@minikube_ip password: tcuser
+    cd /v1/chaincode/basic/packaging
+    start with seller
+    tar cfz code.tar.gz connection.json --> this command with create code.tar.gz file from connection.json file
+    tar cfz basic-seller.tgz code.tar.gz metadata.json --> this command with create basic-seller.tgz file from these 2 files
+    rm -rf code.tar.gz
+    start with buyer
+    sudo vi connection.json
+    type I -> start to edit
+    change basic-seller:7052 --> basic-buyer:7052
+    esc -> :wq -> to save
+    start with buyer
+    tar cfz code.tar.gz connection.json --> this command with create code.tar.gz file from connection.json file
+    tar cfz basic-buyer.tgz code.tar.gz metadata.json --> this command with create basic-buyer.tgz file from these 2 files
+    exit
 13/ install chaincode
-	from lens tool, filter pods by cli
-	access shell of cli-peer0-seller (can access by manual of not setup lens tool)
-	
-	cd /opt/gopath/src/github.com/chaincode/basic/packaging
-	peer lifecycle chaincode install basic-seller.tgz
-
-	cd /opt/gopath/src/github.com/chaincode/basic/packaging
-	peer lifecycle chaincode install basic-buyer.tgz
-	
-	do the same with other peers
-	
-	copy and save the chaincode package identifier of 3 orgs:
-	basic:7deac559c62e3eb24806df28510ca3af3fe534471455e4f519055729770a6257
-	basic:1a3823dae4520b6fac9fa3d2d71cd6811c165908909b505c071d78562b26300e
-	like: basic:1bbb296763656c3e8c13140aa09faf5a12bc1ea33d1f3400bf28cb8c4c9943bd
-	
-	go to docker hub and create new repository
-	then 
-	cd ../8.chaincode/basic
-	docker build -t leminhy89/basic-chaincode-hlf:1.0 .
-	
-	cd ../../9.cc-deploy/basic
-	update seller,2,3-chaincode-deployment.yaml file with correct chaincodeID and image name
-	
-	kubectl apply -f .
-	
-	
+    from lens tool, filter pods by cli
+    access shell of cli-peer0-seller (can access by manual of not setup lens tool)
+    cd /opt/gopath/src/github.com/chaincode/basic/packaging
+    peer lifecycle chaincode install basic-seller.tgz
+    from lens tool, filter pods by cli
+    access shell of cli-peer0-buyer (can access by manual of not setup lens tool)
+    cd /opt/gopath/src/github.com/chaincode/basic/packaging
+    peer lifecycle chaincode install basic-buyer.tgz
+    copy and save the chaincode package identifier of 2 orgs:
+    basic:1db5c1b60335071dbac610cddf935dc96de318ce6f3d65729c06d5503d924980
+    basic:ce079999488ee6eb2260c834178511a54b188d02221c18e164d15e233c90e431
+    like: basic:1bbb296763656c3e8c13140aa09faf5a12bc1ea33d1f3400bf28cb8c4c9943bd
+    go to docker hub and create new repository
+    then 
+    cd ../8.chaincode/basic
+    docker build -t leminhy89/basic-chaincode-hlf:1.0 .
+    docker image
+    docker tag image_id leminhy89/basic-chaincode-hlf:1.0 
+    docker push -t leminhy89/basic-chaincode-hlf:1.0 .
+    cd ../9.cc-deploy/basic
+    update seller,buyer-chaincode-deployment.yaml file with correct chaincodeID and image name
+    kubectl apply -f .
 14/ approve chaincode
-	from lens tool, filter pods by cli
-	access shell of cli-peer0-seller (can access by manual of not setup lens tool)
-	
-	peer lifecycle chaincode approveformyorg --channelID agmchannel --name basic --version 1.0 --init-required --package-id basic:7deac559c62e3eb24806df28510ca3af3fe534471455e4f519055729770a6257 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
-	peer lifecycle chaincode approveformyorg --channelID agmchannel --name basic --version 1.0 --init-required --package-id basic:1a3823dae4520b6fac9fa3d2d71cd6811c165908909b505c071d78562b26300e --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
-	
-	please update package-id as same as your saved above
-	
-	run below command to checkubectl commit
-	peer lifecycle chaincode checkcommitreadiness --channelID agmchannel --name basic --version 1.0 --init-required --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
-	
-	commit chaincode
-	peer lifecycle chaincode commit -o orderer:7050 --channelID agmchannel --name basic --version 1.0 --sequence 1 --init-required --tls true --cafile $ORDERER_CA --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt
-	verrify
-	peer lifecycle chaincode querycommitted -C agmchannel
-	
+    from lens tool, filter pods by cli
+    access shell of cli-peer0-seller (can access by manual of not setup lens tool)
+    peer lifecycle chaincode approveformyorg --channelID agmchannel --name basic --version 1.0 --init-required --package-id basic:1db5c1b60335071dbac610cddf935dc96de318ce6f3d65729c06d5503d924980 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
+    from lens tool, filter pods by cli
+    access shell of cli-peer0-buyer (can access by manual of not setup lens tool)
+    peer lifecycle chaincode approveformyorg --channelID agmchannel --name basic --version 1.0 --init-required --package-id basic:ce079999488ee6eb2260c834178511a54b188d02221c18e164d15e233c90e431 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
+    please update package-id as same as your saved above
+    run below command to checkubectl commit
+    peer lifecycle chaincode checkcommitreadiness --channelID agmchannel --name basic --version 1.0 --init-required --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
+    commit chaincode
+    peer lifecycle chaincode commit -o orderer:7050 --channelID agmchannel --name basic --version 1.0 --sequence 1 --init-required --tls true --cafile $ORDERER_CA --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt
+    verrify
+    peer lifecycle chaincode querycommitted -C agmchannel
 15/ invoke transaction
-	from lens tool, filter pods by cli
-	access shell of cli-peer0-seller (can access by manual of not setup lens tool)
-	
-	invoke transaction
-	peer chaincode invoke -o orderer:7050 --isInit --tls --cafile $ORDERER_CA -C agmchannel -n basic --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt --isInit -c '{"Args":["InitLedger"]}' --waitForEvent
-
-	peer chaincode invoke -o orderer:7050 --isInit --tls --cafile $ORDERER_CA -C agmchannel -n basic --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt --isInit -c '{"function": "CreateImage","Args":["img_uu4Yr1ILs6keY0KQ","{\"title\":\"Test Image\",\"imageURL\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\", \"description\":\"Good\"}", "Dung"]}' --waitForEvent
-		
-	peer chaincode invoke -o orderer:7050 --isInit --tls --cafile $ORDERER_CA -C agmchannel -n basic --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt -c'{"function": "CreateImage","Args":["img_QrZVPQDCdEAl1Pwt","{\"title\":\"Test Image 2\",\"imageURL\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\", \"description\":\"Good\"}", "pavan"]}'
-
-
- peer chaincode invoke -o orderer:7050 --ordererTLSHostnameOverride orderer.agm.com --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C agmchannel -n basic --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt -c '{"function": "CreateImage","Args":["img_uu4Yr1ILs6keY0KQ","{\"title\":\"Test Image\",\"imageURL\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\", \"description\":\"Good\"}", "Dung"]}'
-   
-peer chaincode query -C agmchannel -n basic -c '{"function":"GetAssetHistory", "Args":["asset1"]}'
-peer chaincode query -C agmchannel -n basic -c '{"Args":["GetAllImages"]}'
-	peer chaincode query -C agmchannel -n basic -c '{"function": "GetAllImages","Args":[]}'
-	peer lifecycle chaincode querycommitted --channelID agmchannel --name image
-	peer lifecycle chaincode checkcommitreadiness --channelID agmchannel --name image --version 1 sequence 1 --output json --init-required
+    from lens tool, filter pods by cli
+    access shell of cli-peer0-seller (can access by manual of not setup lens tool)
+    invoke transaction
+    create image
+    peer chaincode invoke -o orderer:7050 --isInit --tls --cafile $ORDERER_CA -C agmchannel -n basic --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt -c '{"function": "CreateImage","Args":["img_uu4Yr1ILs6keY0KQ","{\"title\":\"Test Image\",\"imageURL\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\", \"description\":\"Good\"}", "Dung"]}' --waitForEvent
+    peer chaincode invoke -o orderer:7050 --tls --cafile $ORDERER_CA -C agmchannel -n basic --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt --isInit -c '{"function": "CreateImage","Args":["img_uu4Yr1ILs6keY0KL","{\"title\":\"Test Image 1\",\"imageURL\":\"https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg\", \"description\":\"Good\"}", "Dung"]}' --waitForEvent
+    listing 
+    peer chaincode invoke -o orderer:7050 --tls --cafile $ORDERER_CA -C agmchannel -n basic --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt -c '{"function": "UpdateImageStatusListingMarketplace","Args":["img_uu4Yr1ILs6keY0KQ","Listing", "Dung"]}' --waitForEvent
+    peer chaincode invoke -o orderer:7050 --tls --cafile $ORDERER_CA -C agmchannel -n basic --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt -c '{"function": "CreateTransaction","Args":["trans_eqIvthBitE5xDXrG" ,"{\"image_id\":\"img_uu4Yr1ILs6keY0KQ\"}", "pavan"]}' --waitForEvent
+    peer chaincode invoke -o orderer:7050 --tls --cafile $ORDERER_CA -C agmchannel -n basic --peerAddresses peer0-seller:7051 --tlsRootCertFiles /organizations/peerOrganizations/seller.agm.com/peers/peer0.seller.agm.com/tls/ca.crt --peerAddresses peer0-buyer:7051 --tlsRootCertFiles /organizations/peerOrganizations/buyer.agm.com/peers/peer0.buyer.agm.com/tls/ca.crt -c '{"function": "UpdateTransaction","Args":["trans_eqIvthBitE5xDXrG","SellerConfirmed","Dung"]}' --waitForEvent
+    history image
+    peer chaincode query -C agmchannel -n basic -c '{"function":"GetHistoryForAsset", "Args":["img_uu4Yr1ILs6keY0KQ"]}'
+    get all image
+    peer chaincode query -C agmchannel -n basic -c '{"function": "GetAllImages","Args":[]}'
+    peer chaincode query -C agmchannel -n basic -c '{"function": "GetImageById","Args":["img_uu4Yr1ILs6keY0KQ", "pavan"]}'
 16/ Access couchdb
-	kubectl port-forward services/peer0-seller 5984:5984	
-	open browser to check: http://127.0.0.1:5984/_utils/
-	
-	try with another org
-	kubectl port-forward services/peer0-buyer 5985:5984	
-	open browser to check: http://127.0.0.1:5985/_utils/
-	
-	data must be same
-	
-	
-17/	Create connection profile
-	ssh docker@minikube_ip password: tcuser
-	cd /v1
-	./scripts/ccp.sh
-	ls -la connection-profile
-	
+    kubectl port-forward services/peer0-seller 5984:5984    
+    open browser to check: http://127.0.0.1:5984/_utils/
+    try with another org
+    kubectl port-forward services/peer0-buyer 5985:5984 
+    open browser to check: http://127.0.0.1:5985/_utils/
+    data must be same
+17/ Create connection profile
+    ssh docker@minikube_ip password: tcuser
+    cd /v1
+    ./scripts/ccp.sh
+    ls -la connection-profile
+    exit
 18/ Override Fabric CA default configuration
-	cd 10.api/k8
-	kubectl apply -f configmap.yaml
-	
+    cd 10.api/k8
+    kubectl apply -f configmap.yaml
 19/ create nodejs application docker and update to 10.api/k8/api.yaml file
+check docker images , if not node then
+    docker pull node:latest
 20/ starting api server
-	cd /10.api/k8
-	kubectl apply -f api.yaml
-	
-	port service to test
-	kubectl port-forward services/api 4000
-21/ cd 11.frontend	
-kubectl apply -f frontend.yaml
-	
+    cd /10.api/k8
+    kubectl apply -f api.yaml
+    port service to test
+    kubectl port-forward services/api 4000
+21/ cd 11.frontend  
+    kubectl apply -f frontend.yaml
 22/ creating hyperledger explorer
-	ssh docker@minikube_ip password: tcuser
-	cd /v1/organizations/peerOrganizations/seller.agm.com
-	sudo chown -R docker:docker ./users
-	cd /v1/organizations/peerOrganizations/seller.agm.com/users/Admin\@seller.agm.com/msp/keystore/
-	ls -> get the private key
-	cp private_key priv_sk
-	ex: cp 87a2fbcba59ae9feafeb22a079b0effce1a2055e7c07ba2fd8e7ce077dd2965b_skubectl priv_sk
-	
-	exit
-
+    ssh docker@minikube_ip password: tcuser
+    cd /v1/organizations/peerOrganizations/seller.agm.com
+    sudo chown -R docker:docker ./users
+    cd /v1/organizations/peerOrganizations/seller.agm.com/users/Admin\@seller.agm.com/msp/keystore/
+    ls -> get the private key
+    cp private_key priv_sk
+    ex: cp 87a2fbcba59ae9feafeb22a079b0effce1a2055e7c07ba2fd8e7ce077dd2965b_skubectl priv_sk
+    exit
 23/ start hyperledger explorer
-	cd 12.explorer
-	kubectl apply -f configmap.yaml
-	kubectl apply -f explorerdb.yaml
-	kubectl apply -f explorer.yaml
-	
-	kubectl port-forward services/explorer 8080
-	open http://127.0.0.1:8080 to view the explorer	
+    cd 12.explorer
+    kubectl apply -f configmap.yaml
+    kubectl apply -f explorerdb.yaml
+    kubectl apply -f explorer.yaml
+    kubectl port-forward services/explorer 8080
+    open http://127.0.0.1:8080 to view the explorer

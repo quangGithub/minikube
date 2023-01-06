@@ -2,7 +2,7 @@
 mkdir -p /organizations/peerOrganizations/buyer.agm.com/
 export FABRIC_CA_CLIENT_HOME=/organizations/peerOrganizations/buyer.agm.com/
 
-fabric-ca-client enroll -u https://admin:adminpw@ca-buyer:8054 --caname ca-buyer --tls.certfiles "/organizations/fabric-ca/buyer/tls-cert.pem"
+fabric-ca-client enroll -u https://agmadmin:agmadminpw@ca-buyer:8054 --caname ca-buyer --tls.certfiles "/organizations/fabric-ca/buyer/tls-cert.pem"
 
 echo 'NodeOUs:
   Enable: true

@@ -34,7 +34,7 @@ spec:
             requests:
               memory: '400Mi'
               cpu: '300m'
-          image: leminhy89/asm-api:1.1
+          image: quanglathe/agm-api:1.1
           imagePullPolicy: Always
           volumeMounts:
             - name: data
