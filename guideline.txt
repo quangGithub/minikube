@@ -24,7 +24,7 @@
 	
 4/ copy all folder inside prerequsite foder to /v1 folder in minikube node
 	minikube ip
-	ssh docker@172.31.175.126
+	ssh docker@172.28.211.197
 	ssh docker@minikube_ip password: tcuser
 	cd /v1
 	grant permission to docker user
@@ -116,8 +116,8 @@
     cd /opt/gopath/src/github.com/chaincode/basic/packaging
     peer lifecycle chaincode install basic-buyer.tgz
     copy and save the chaincode package identifier of 2 orgs:
-    basic:1db5c1b60335071dbac610cddf935dc96de318ce6f3d65729c06d5503d924980
-    basic:ce079999488ee6eb2260c834178511a54b188d02221c18e164d15e233c90e431
+    basic:2e797e276375d215e7eef890ad53d35e02a86a30516043adb65acdc705c9d04b
+    basic:6391cecbdf7fd6cfddd9638b46f4bf1f426b86913f5071d70dc6b8909de5f633
     like: basic:1bbb296763656c3e8c13140aa09faf5a12bc1ea33d1f3400bf28cb8c4c9943bd
     go to docker hub and create new repository
     then 
@@ -132,10 +132,10 @@
 14/ approve chaincode
     from lens tool, filter pods by cli
     access shell of cli-peer0-seller (can access by manual of not setup lens tool)
-    peer lifecycle chaincode approveformyorg --channelID agmchannel --name basic --version 1.0 --init-required --package-id basic:1db5c1b60335071dbac610cddf935dc96de318ce6f3d65729c06d5503d924980 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
+    peer lifecycle chaincode approveformyorg --channelID agmchannel --name basic --version 1.0 --init-required --package-id basic:2e797e276375d215e7eef890ad53d35e02a86a30516043adb65acdc705c9d04b --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
     from lens tool, filter pods by cli
     access shell of cli-peer0-buyer (can access by manual of not setup lens tool)
-    peer lifecycle chaincode approveformyorg --channelID agmchannel --name basic --version 1.0 --init-required --package-id basic:ce079999488ee6eb2260c834178511a54b188d02221c18e164d15e233c90e431 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
+    peer lifecycle chaincode approveformyorg --channelID agmchannel --name basic --version 1.0 --init-required --package-id basic:6391cecbdf7fd6cfddd9638b46f4bf1f426b86913f5071d70dc6b8909de5f633 --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA
     please update package-id as same as your saved above
     run below command to checkubectl commit
     peer lifecycle chaincode checkcommitreadiness --channelID agmchannel --name basic --version 1.0 --init-required --sequence 1 -o orderer:7050 --tls --cafile $ORDERER_CA

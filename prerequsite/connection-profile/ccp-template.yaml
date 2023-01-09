@@ -24,7 +24,7 @@ peers:
       hostnameOverride: peer0-${ORG}
 certificateAuthorities:
   ca-${ORG}:
-    url: https://ca-org${ORG}:${CAPORT}
+    url: https://ca-${ORG}:${CAPORT}
     caName: ca-${ORG}
     tlsCACerts:
       pem:

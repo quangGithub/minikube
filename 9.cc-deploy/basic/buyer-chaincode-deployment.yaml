@@ -23,7 +23,7 @@ spec:
           name: chaincode-basic-buyer
           env:
             - name: CHAINCODE_ID
-              value: 'basic:ce079999488ee6eb2260c834178511a54b188d02221c18e164d15e233c90e431'
+              value: 'basic:6391cecbdf7fd6cfddd9638b46f4bf1f426b86913f5071d70dc6b8909de5f633'
             - name: CHAINCODE_SERVER_ADDRESS
               value: '0.0.0.0:7052'
           ports:
